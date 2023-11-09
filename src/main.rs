@@ -1,4 +1,6 @@
-fn binary_search(array: &[i32], target: i32) -> Option<i32> {
+use std::num::TryFromIntError;
+
+fn binary_search(array: &[i32], target: i32) -> Result<i32, TryFromIntError> {
     
     let mut left = 0;
     let mut right = array.len() - 1;
@@ -16,13 +18,13 @@ fn binary_search(array: &[i32], target: i32) -> Option<i32> {
         }
         else{
             return match mid.try_into() {
-                Ok(result) => Some(result),
-                Err(_) => None
+                Ok(result) => Ok(result),
+                Err(err) => Err(err)
             }
         }
     }
 
-    return Some(-1);
+    return Ok(-1);
 }
 
 
@@ -32,7 +34,7 @@ fn main() {
     .expect("wrong size iterator");
 
     match binary_search(&array, 38) {
-        Some(num) => println!("{}", num),
-        None => println!("Error")
+        Ok(num) => println!("{}", num),
+        Err(_) => println!("Error")
     }
 }
