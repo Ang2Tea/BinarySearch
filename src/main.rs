@@ -1,6 +1,11 @@
 use std::num::TryFromIntError;
 
-fn binary_search(array: &[i32], target: i32) -> Result<i32, TryFromIntError> {
+enum ErrorKind {
+    TryFromIntError(TryFromIntError),
+    NotFound
+}
+
+fn binary_search(array: &[i32], target: i32) -> Result<i32, ErrorKind> {
     
     let mut left = 0;
     let mut right = array.len() - 1;
@@ -19,12 +24,12 @@ fn binary_search(array: &[i32], target: i32) -> Result<i32, TryFromIntError> {
         else{
             return match mid.try_into() {
                 Ok(result) => Ok(result),
-                Err(err) => Err(err)
+                Err(err) => Err(ErrorKind::TryFromIntError(err))
             }
         }
     }
 
-    return Ok(-1);
+    return Err(ErrorKind::NotFound);
 }
 
 
@@ -33,8 +38,11 @@ fn main() {
     .try_into()
     .expect("wrong size iterator");
 
-    match binary_search(&array, 38) {
+    match binary_search(&array, 101) {
         Ok(num) => println!("{}", num),
-        Err(_) => println!("Error")
+        Err(err) => match err {
+            ErrorKind::NotFound => println!("Число не найдено"),
+            ErrorKind::TryFromIntError(_) => println!("Не удалось за мапить число")
+        }
     }
 }
